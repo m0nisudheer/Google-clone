@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div id="logo">
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google Logo">
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search Google or type a URL" id="searchInput"/>
+            <img id="searchImage" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/512px-Magnifying_glass_icon.svg.png" alt="Search Icon">
+        </div>
+        <div>
+            <button id="searchButton">Google Search</button>
+            <button id="shortcutButton">Save Shortcut</button>
+        </div>
+        <div id="shortcuts">
+            <h3>Saved Shortcuts:</h3>
+            <div id="shortcutList"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('searchButton').addEventListener('click', function() {
+            let searchInput = document.getElementById("searchInput").value;
+            let searchURL = "https://www.google.com/search?q=" + encodeURIComponent(searchInput);
+            window.open(searchURL, '_blank');
+        });
+
+        document.getElementById('shortcutButton').addEventListener('click', function() {
+            let searchInput = document.getElementById("searchInput").value;
+            if (searchInput) {
+                addShortcut(searchInput);
+                saveShortcut(searchInput);
+            }
+        });
+
+        function addShortcut(query) {
+            let shortcutList = document.getElementById("shortcutList");
+            let shortcutDiv = document.createElement("div");
+            shortcutDiv.className = "shortcut-circle";
+
+            let link = document.createElement("a");
+            link.href = "https://www.google.com/search?q=" + encodeURIComponent(query);
+            link.target = "_blank";
+            link.textContent = query.charAt(0).toUpperCase();
+
+            let deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "X";
+            deleteBtn.className = "delete-btn";
+            deleteBtn.onclick = function() {
+                deleteShortcut(query, shortcutDiv);
+            };
+
+            shortcutDiv.appendChild(link);
+            shortcutDiv.appendChild(deleteBtn);
+            shortcutList.appendChild(shortcutDiv);
+        }
+
+        function saveShortcut(query) {
+            let shortcuts = JSON.parse(localStorage.getItem('shortcuts')) || [];
+            shortcuts.push(query);
+            localStorage.setItem('shortcuts', JSON.stringify(shortcuts));
+        }
+
+        function deleteShortcut(query, element) {
+            let shortcuts = JSON.parse(localStorage.getItem('shortcuts')) || [];
+            shortcuts = shortcuts.filter(item => item !== query);
+            localStorage.setItem('shortcuts', JSON.stringify(shortcuts));
+            element.remove();
+        }
+
+        function loadShortcuts() {
+            let shortcuts = JSON.parse(localStorage.getItem('shortcuts')) || [];
+            shortcuts.forEach(function(query) {
+                addShortcut(query);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadShortcuts);
+    </script>
+</body>
+</html>
